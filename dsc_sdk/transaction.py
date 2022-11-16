@@ -8,6 +8,8 @@ from .wallet import Wallet
 from Crypto.Hash import keccak
 import ctypes
 
+from decimal import Decimal
+
 class Transaction:
     def __init__(self):
         self._tx_body = None
@@ -72,6 +74,8 @@ class Transaction:
         '''
         bz = self.sign(signer)
         amount = api.simulate_fee(bz, denom)
+        #+10% for additional bytes after set_fee
+        amount = str((Decimal(amount)*Decimal(1.1)).to_integral_value())
         self.set_fee(denom, amount)
 
 

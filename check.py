@@ -1,8 +1,5 @@
-from dsc_sdk.api import DscAPI
-from dsc_sdk.wallet import Wallet
-from dsc_sdk.transaction import Transaction
-from dsc_sdk.tx_types import MsgSendCoin, MsgSendToken
-from dsc_sdk.number_helpers import ether_to_wei
+from dsc_python_sdk import DscAPI, Wallet, Transaction, MsgSendCoin, MsgSendToken, ether_to_wei
+
 import time
 
 api = DscAPI("https://devnet-gate.decimalchain.com/api/")
@@ -12,6 +9,8 @@ print(api.get_base_denom())
 
 ############################
 # send transaction
+
+step = 3
 
 # dx1tlykyxn3zddwm7w89raurwuvwa5apv4w32th0f
 mnemonic1 = "plug tissue today frown increase race brown sail post march trick coconut laptop churn call child question match also spend play credit already travel"
@@ -31,33 +30,51 @@ w2.set_account_number(an)
 w2.set_sequence(seq)
 w2.set_chain_id(api.get_chain_id())
 
-msg = MsgSendCoin(w1.get_address(), w2.get_address(), api.get_base_denom(), ether_to_wei(1))
-tx = Transaction.build_tx(msg)
-tx.set_memo("hello")
-txbytes = tx.sign(w1)
-#txres = api.broadcast_tx(txbytes, "sync")
-txres = api.broadcast(txbytes)
-print(txres.hash, txres.code, txres.codespace)
+if step == 1:
+    msg = MsgSendCoin(w1.get_address(), w2.get_address(), api.get_base_denom(), ether_to_wei(1))
+    tx = Transaction.build_tx(msg)
+    tx.set_memo("hello")
+    txbytes = tx.sign(w1)
+    #txres = api.broadcast_tx(txbytes, "sync")
+    txres = api.broadcast(txbytes)
+    print(txres.hash, txres.code, txres.codespace)
 
 
 ############################
 # calculate fee
 
-time.sleep(3)
+if step == 2:
+    time.sleep(3)
 
-an, seq = api.get_account_number_and_sequence(w1.get_address())
-w1.set_account_number(an)
-w1.set_sequence(seq)
+    an, seq = api.get_account_number_and_sequence(w1.get_address())
+    w1.set_account_number(an)
+    w1.set_sequence(seq)
 
-msg = MsgSendToken(w1.get_address(), w2.get_address(), "ae97ec4876e2bd47775e3876e72dc521a00e8f3d", [2])
-tx = Transaction.build_tx(msg)
-tx.set_memo("hello")
-txbytes = tx.sign(w1)
+    msg = MsgSendToken(w1.get_address(), w2.get_address(), "ae97ec4876e2bd47775e3876e72dc521a00e8f3d", [2])
+    tx = Transaction.build_tx(msg)
+    tx.set_memo("hello")
+    txbytes = tx.sign(w1)
 
-fee = api.simulate_fee(txbytes, "initiald")
-print(type(fee), fee)
-fee = api.simulate_fee(txbytes, "del")
-print(type(fee), fee)
+    fee = api.simulate_fee(txbytes, "initiald")
+    print(type(fee), fee)
+    fee = api.simulate_fee(txbytes, "del")
+    print(type(fee), fee)
 
 #txres = api.broadcast_tx(tx.SerializeToString(deterministic=True), "sync")
 #print(txres.hash, txres.code, txres.codespace)
+
+############################
+# custom fee
+if step == 3:
+    an, seq = api.get_account_number_and_sequence(w1.get_address())
+    w1.set_account_number(an)
+    w1.set_sequence(seq)
+
+    msg = MsgSendCoin(w1.get_address(), w2.get_address(), api.get_base_denom(), ether_to_wei(1))
+    tx = Transaction.build_tx(msg)
+    tx.set_memo("hello from python")
+    tx.calculate_fee(w1, "initiald", api)
+    txbytes = tx.sign(w1)
+    #txres = api.broadcast_tx(txbytes, "sync")
+    txres = api.broadcast(txbytes)
+    print(txres.hash, txres.code, txres.codespace, txres.log)
