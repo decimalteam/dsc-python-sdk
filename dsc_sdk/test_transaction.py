@@ -1,5 +1,3 @@
-import sys
-
 import unittest
 
 from .proto.cosmos.base.v1beta1 import coin_pb2 as cosmos_coin
