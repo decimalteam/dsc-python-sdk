@@ -40,8 +40,8 @@ class Transaction:
             self._fee = cosmos_tx.Fee(
                 amount = [cosmos_coin.Coin(denom=denom, amount=amount)],
                 gas_limit = 0,
-            )            
-
+            )
+    
     def sign(self, signer: Wallet) -> bytes:
         auth_info  = cosmos_tx.AuthInfo(
             signer_infos = [
@@ -73,48 +73,25 @@ class Transaction:
         calculate fee in coin 'denom' by use api.simulate_fee
         '''
         bz = self.sign(signer)
-        amount = api.simulate_fee(bz, denom)
-        #+10% for additional bytes after set_fee
-        amount = str((Decimal(amount)*Decimal(1.1)).to_integral_value())
-        self.set_fee(denom, amount)
-
-
-def build_tx(sender: Wallet, msg, opts = {}) -> cosmos_tx.TxRaw:
-    memo = ""
-    if "memo" in opts:
-        memo = opts["memo"]
-
-    tx_body = cosmos_tx.TxBody(
-        messages = [packToAny(msg)],
-        memo = memo,
-    )
-    auth_info = cosmos_tx.AuthInfo(
-        signer_infos = [
-            cosmos_tx.SignerInfo(
-                public_key = packToAny(sender.get_public_key()),
-                mode_info = cosmos_tx.ModeInfo(single=cosmos_tx.ModeInfo.Single(mode=1)),
-                sequence = sender.get_sequence(),
-            )
-        ],
-        fee = cosmos_tx.Fee(
-            #amount = [cosmos_coin.Coin(denom=opts["fee_denom"], amount=opts["fee_amount"])],
-            gas_limit = 0,
-        )
-    )
-    signDoc = cosmos_tx.SignDoc(
-        body_bytes = tx_body.SerializeToString(deterministic=True),
-        auth_info_bytes = auth_info.SerializeToString(deterministic=True),
-        chain_id = sender.get_chain_id(),
-        account_number = sender.get_account_number(),
-    )
-    hsh = keccak.new(data=signDoc.SerializeToString(deterministic=True), digest_bits=256).digest()
-    signature = sender.sign_bytes(hsh)
-
-    return cosmos_tx.TxRaw(
-        body_bytes = tx_body.SerializeToString(),
-        auth_info_bytes = auth_info.SerializeToString(),
-        signatures = [signature],
-    )
+        fail_count = 0
+        old_amount = 0
+        amount = 1
+        while old_amount != amount:
+            obj = api.simulate_fee(bz, denom)
+            if isinstance(obj, int):
+                old_amount = amount
+                amount = obj
+                #+10% for additional bytes after set_fee
+                amount = (Decimal(amount)*Decimal(1.1)).to_integral_value()
+                self.set_fee(denom, str(amount))
+            else:
+                fail_count += 1
+                if fail_count > 5:
+                    return 0                
+                amount = (Decimal(amount)*Decimal(1.1)).to_integral_value()
+                self.set_fee(denom, str(amount))
+        return amount
+        
 
 def packToAny(msg) -> any_pb2.Any:
     any = any_pb2.Any()

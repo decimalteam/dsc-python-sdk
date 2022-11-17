@@ -1,4 +1,4 @@
-from dsc_python_sdk import DscAPI, Wallet, Transaction, MsgSendCoin, MsgSendToken, ether_to_wei
+from dsc_sdk import DscAPI, Wallet, Transaction, MsgSendCoin, MsgSendToken, ether_to_wei, BuildSendAllCoin
 
 import time
 
@@ -10,7 +10,7 @@ print(api.get_base_denom())
 ############################
 # send transaction
 
-step = 3
+step = 5
 
 # dx1tlykyxn3zddwm7w89raurwuvwa5apv4w32th0f
 mnemonic1 = "plug tissue today frown increase race brown sail post march trick coconut laptop churn call child question match also spend play credit already travel"
@@ -50,15 +50,16 @@ if step == 2:
     w1.set_account_number(an)
     w1.set_sequence(seq)
 
-    msg = MsgSendToken(w1.get_address(), w2.get_address(), "ae97ec4876e2bd47775e3876e72dc521a00e8f3d", [2])
+    #msg = MsgSendToken(w1.get_address(), w2.get_address(), "ae97ec4876e2bd47775e3876e72dc521a00e8f3d", [2])
+    msg = MsgSendCoin(w1.get_address(), w2.get_address(), api.get_base_denom(), ether_to_wei(1))
     tx = Transaction.build_tx(msg)
     tx.set_memo("hello")
     txbytes = tx.sign(w1)
 
-    fee = api.simulate_fee(txbytes, "initiald")
-    print(type(fee), fee)
-    fee = api.simulate_fee(txbytes, "del")
-    print(type(fee), fee)
+    for coin in ["initiald", "del", "notexist"]:
+        print("start calc for ", coin)
+        fee = api.simulate_fee(txbytes, coin)
+        print(type(fee), fee)
 
 #txres = api.broadcast_tx(tx.SerializeToString(deterministic=True), "sync")
 #print(txres.hash, txres.code, txres.codespace)
@@ -76,5 +77,29 @@ if step == 3:
     tx.calculate_fee(w1, "initiald", api)
     txbytes = tx.sign(w1)
     #txres = api.broadcast_tx(txbytes, "sync")
+    txres = api.broadcast(txbytes)
+    print(txres.hash, txres.code, txres.codespace, txres.log)
+
+############################
+# send all
+if step == 4:
+    an, seq = api.get_account_number_and_sequence(w1.get_address())
+    w1.set_account_number(an)
+    w1.set_sequence(seq)
+    txbytes = BuildSendAllCoin(w1, api, w2.get_address(), "initiald")
+    if txbytes == None:
+        exit(0)
+    txres = api.broadcast(txbytes)
+    print(txres.hash, txres.code, txres.codespace, txres.log)
+
+############################
+# send all
+if step == 5:
+    an, seq = api.get_account_number_and_sequence(w1.get_address())
+    w1.set_account_number(an)
+    w1.set_sequence(seq)
+    txbytes = BuildSendAllCoin(w1, api, w2.get_address(), "del")
+    if txbytes == None:
+        exit(0)    
     txres = api.broadcast(txbytes)
     print(txres.hash, txres.code, txres.codespace, txres.log)

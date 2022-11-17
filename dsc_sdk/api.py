@@ -1,6 +1,6 @@
 import requests
 import json
-from typing import Tuple
+from typing import Tuple, Dict
 import codecs
 
 class DscAPI:
@@ -31,7 +31,21 @@ class DscAPI:
     def get_account_number_and_sequence(self, address: str) -> Tuple[int, int]:
         self.__validate_address(address)
         resp = json.loads(self.__request_gate(f'rpc/accounts/{address}'))
-        return (int(resp["account"]["base_account"]["account_number"]), int(resp["account"]["base_account"]["sequence"]))
+        try:
+            return (int(resp["account"]["base_account"]["account_number"]), int(resp["account"]["base_account"]["sequence"]))
+        except KeyError:
+            return (0, 0)
+
+    def get_account_balances(self, address: str) -> Dict[str, str]:
+        self.__validate_address(address)
+        resp = json.loads(self.__request_gate(f'address/{address}/balances'))
+        try:
+            result = {}
+            for k,v in resp["result"].items():
+                result[k] = v["amount"]
+            return result
+        except KeyError:
+            return {}
 
     def broadcast(self, tx_bytes: bytes):
         resp = json.loads(self.__request_gate("rpc/txs", method="post", payload={"hexTx": tx_bytes.hex()}))
@@ -47,7 +61,7 @@ class DscAPI:
             "tx_bytes": list(tx_bytes),
             "feeCoin": fee_denom,
         })
-        return resp
+        return json.loads(resp)
 
     @staticmethod
     def __validate_address(address: str):
