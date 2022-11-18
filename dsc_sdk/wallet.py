@@ -138,3 +138,11 @@ class Wallet:
 
     def sign_bytes(self, msg: bytes) -> bytes:
         return self._private_key_eth.sign_recoverable(msg, hasher=None)
+
+def check_address_validity(address: str) -> bool:
+    prefix, addr_bytes = bech32.bech32_decode(address)
+    if prefix != ADDRESS_PREFIX:
+        return False
+    if prefix == None or addr_bytes == None:
+        return False
+    return True
