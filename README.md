@@ -97,3 +97,9 @@ print(txres.hash, txres.code, txres.codespace)
 - MsgSendToken(sender: str, recipient: str, token_id: str, sub_token_ids: List[int])
 
 ## Known query methods
+
+## Helper functions
+
+- `ether_to_wei` : convert integer value to valid amount representation ( * 10^18)
+- `finney_to_wei` : convert integer value to valid amount representation ( * 10^15)
+- `check_address_validity` : check bech32 address; return true if it's valid bech32 representation 

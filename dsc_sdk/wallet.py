@@ -145,4 +145,6 @@ def check_address_validity(address: str) -> bool:
         return False
     if prefix == None or addr_bytes == None:
         return False
+    if len(addr_bytes) != 32:
+        return False
     return True
