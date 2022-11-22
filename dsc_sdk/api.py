@@ -2,17 +2,26 @@ import requests
 import json
 from typing import Tuple, Dict
 import codecs
+from .wallet import Wallet
+from hexbytes import HexBytes
+from eth_account import Account
+from web3 import Web3
+from web3.middleware import construct_sign_and_send_raw_middleware
 
 class DscAPI:
     """
     Base class to perform operations on Decimal API.
     Create new instance of api with passing base URL to DecimalAPI class.
+
+    gate_url: url to decimal gate
+    web3_url: http url to operate with EVM (need for erc20 tokens)
     """
 
-    def __init__(self, gate_url: str):
+    def __init__(self, gate_url: str, web3_url: str):
         self.gate_url = gate_url
         if self.gate_url[-1] != '/':
             self.gate_url += '/'
+        self.web3_url = web3_url
     
     def get_parameters(self):
         """
@@ -62,6 +71,55 @@ class DscAPI:
             "feeCoin": fee_denom,
         })
         return json.loads(resp)
+    
+    def get_erc20_tokens(self, limit=10, offset=0):
+        ''' Get list of known erc20 token by query gateway '''
+        obj = json.loads(self.__request_gate("evm-tokens/list", options={"limit": limit, "offset": offset}))
+        if not obj["ok"]:
+            return []
+        return obj["result"]["evmTokensList"]
+
+    def erc20_build_token(self, name: str, symbol: str, supply: str, max_supply: str,
+            mintable: bool, burnable: bool, capped: bool) -> bytes:
+        ''' Build smart contract bytecode for erc20 token
+        name: human readable long name
+        symbol: token symbol (denom)
+        supply: initial token supply in eth (bip)
+        max_supply: maximal token supply in eth (bip)
+        mintable: boolean - allow to mint
+        burnable: boolean - allow to burn
+        capped: boolean
+        '''
+        resp = self.__request_gate("evm-token/data", options={
+            "name": name,
+            "symbol": symbol,
+            "supply": supply,
+            "maxSupply": max_supply,
+            "mintable": mintable,
+            "burnable": burnable,
+            "capped": capped,
+        })
+        obj = json.loads(resp)
+        if not obj["ok"]:
+            return None
+        return HexBytes(obj["result"])
+
+    def erc20_create_token(self, wallet: Wallet, contract_bytecode: bytes):
+        ethacc = Account.from_key(wallet.get_private_key_bytes())
+        w3conn = Web3(Web3.HTTPProvider(self.web3_url))
+        w3conn.middleware_onion.add(construct_sign_and_send_raw_middleware(ethacc))
+        txhash = w3conn.eth.send_transaction({
+            "from": ethacc.address,
+            "data": contract_bytecode,
+        })
+        return w3conn.eth.wait_for_transaction_receipt(txhash)
+    
+    def erc20_contract_instance(self, wallet: Wallet, address: str, abi):
+        ''' Construct contract of web3 where default account is :wallet: '''
+        ethacc = Account.from_key(wallet.get_private_key_bytes())
+        w3conn = Web3(Web3.HTTPProvider(self.web3_url))
+        w3conn.middleware_onion.add(construct_sign_and_send_raw_middleware(ethacc))
+        return w3conn.eth.contract(Web3.toChecksumAddress(address), abi=abi)
 
     @staticmethod
     def __validate_address(address: str):

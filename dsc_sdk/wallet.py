@@ -5,6 +5,8 @@ from mnemonic import Mnemonic
 from coincurve import PublicKey, PrivateKey
 from bip32 import BIP32
 import bech32
+from hexbytes import HexBytes
+from web3 import Web3
 
 from .proto.ethermint.crypto.v1.ethsecp256k1 import keys_pb2 as ethermint_crypto
 
@@ -42,6 +44,18 @@ class Wallet:
         returns addres of the wallet
         '''
         return self._address
+
+    def get_ethereum_address(self) -> str:
+        '''
+        returns hex addres of the wallet in lower case (need for search)
+        '''        
+        return self._ethereum_address
+
+    def get_checksum_address(self) -> str:
+        '''
+        returns hex addres of the wallet in mixed case (need for contract calls)
+        '''  
+        return self._checksum_address
 
     def get_mnemonic(self) -> str:
         '''
@@ -113,6 +127,8 @@ class Wallet:
         prepared_hash = self.__hash_public_key()
         address = bech32.bech32_encode(ADDRESS_PREFIX, bech32.convertbits(prepared_hash, 8, 5))
         self._address = address
+        self._ethereum_address = HexBytes(prepared_hash).hex()
+        self._checksum_address = Web3.toChecksumAddress(self._ethereum_address)
 
     def __generate_validator_address(self):
         prepared_hash = self.__hash_public_key()
@@ -148,3 +164,16 @@ def check_address_validity(address: str) -> bool:
     if len(addr_bytes) != 32:
         return False
     return True
+
+def dx_to_hex(address: str) -> str:
+    prefix, addr_bytes = bech32.bech32_decode(address)
+    if prefix == None or addr_bytes == None:
+        return None
+    addr5to8 = bech32.convertbits(addr_bytes, 5, 8)
+    return HexBytes(bytes(addr5to8)).hex()
+
+def hex_to_dx(address: str) -> str:
+    return bech32.bech32_encode(ADDRESS_PREFIX, HexBytes(address))
+
+def checksum_address(address: str) -> str:
+    return Web3.toChecksumAddress(address)
