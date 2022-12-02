@@ -11,7 +11,7 @@ print(api.get_base_denom())
 ############################
 # send transaction
 
-step = 7
+step = 4
 
 # dx1tlykyxn3zddwm7w89raurwuvwa5apv4w32th0f
 mnemonic1 = "plug tissue today frown increase race brown sail post march trick coconut laptop churn call child question match also spend play credit already travel"
@@ -59,7 +59,7 @@ if step == 2:
 
     for coin in ["initiald", "del", "notexist"]:
         print("start calc for ", coin)
-        fee = api.simulate_fee(txbytes, coin)
+        fee = api.calculate_fee(txbytes, coin)
         print(type(fee), fee)
 
 #txres = api.broadcast_tx(tx.SerializeToString(deterministic=True), "sync")

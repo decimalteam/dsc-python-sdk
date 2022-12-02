@@ -7,7 +7,7 @@ from hexbytes import HexBytes
 from eth_account import Account
 from web3 import Web3
 from web3.middleware import construct_sign_and_send_raw_middleware
-
+from .exceptions import ApiException
 class DscAPI:
     """
     Base class to perform operations on Decimal API.
@@ -39,7 +39,7 @@ class DscAPI:
 
     def get_account_number_and_sequence(self, address: str) -> Tuple[int, int]:
         self.__validate_address(address)
-        resp = json.loads(self.__request_gate(f'rpc/accounts/{address}'))
+        resp = json.loads(self.__request_gate(f'rpc/auth/accounts/{address}'))
         try:
             return (int(resp["account"]["base_account"]["account_number"]), int(resp["account"]["base_account"]["sequence"]))
         except KeyError:
@@ -65,12 +65,16 @@ class DscAPI:
             codespace = resp["result"]["codespace"],
         )
 
-    def simulate_fee(self, tx_bytes: bytes, fee_denom: str) -> str:
-        resp = self.__request_gate("rpc/simulate_fee", method="post", payload = {
-            "tx_bytes": list(tx_bytes),
-            "feeCoin": fee_denom,
+    def calculate_fee(self, tx_bytes: bytes, fee_denom: str) -> str:
+        ''' Calculate fee using gateway method /tx/estimate'''
+        resp = self.__request_gate("tx/estimate", method="post", payload = {
+            "tx_bytes": tx_bytes.hex(),
+            "denom": fee_denom,
         })
-        return json.loads(resp)
+        obj = json.loads(resp)
+        if obj["ok"]:
+            return obj["result"]["commission"]
+        return ""
     
     def get_erc20_tokens(self, limit=10, offset=0):
         ''' Get list of known erc20 token by query gateway '''
@@ -135,6 +139,13 @@ class DscAPI:
                 response = requests.get(url)
         else:
             response = requests.post(url, payload)
+        # process errors for rpc
+        try:
+            obj = json.loads(response.text)
+            if ("statusCode" in obj) and ("message" in obj):
+                raise ApiException(obj["statusCode"], obj["message"])
+        except:
+            pass
         return response.text        
 
 class TxResult:

@@ -8,7 +8,6 @@ certifi==2020.11.8
 cffi==1.14.3
 chardet==3.0.4
 coincurve==17.0.0
-cytoolz==0.11.0
 ecdsa==0.16.1
 eth-hash==0.3.1
 eth-typing==2.2.2
@@ -25,4 +24,5 @@ pycryptodome==3.15.0
 pycryptodomex==3.15.0
 pyethash==0.1.27
 requests==2.25.0
-protobuf==3.12.4
+protobuf==3.19.5
+web3==5.31.1

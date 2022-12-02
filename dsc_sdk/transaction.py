@@ -5,6 +5,7 @@ from .proto.cosmos.base.v1beta1 import coin_pb2 as cosmos_coin
 import google.protobuf.any_pb2 as any_pb2
 
 from .wallet import Wallet
+from .exceptions import BuildException
 from Crypto.Hash import keccak
 import ctypes
 
@@ -70,26 +71,22 @@ class Transaction:
 
     def calculate_fee(self, signer: Wallet, denom: str, api):
         '''
-        calculate fee in coin 'denom' by use api.simulate_fee
+        calculate fee in coin 'denom' by use api.calculate_fee
         '''
         bz = self.sign(signer)
         fail_count = 0
         old_amount = 0
         amount = 1
         while old_amount != amount:
-            obj = api.simulate_fee(bz, denom)
-            if isinstance(obj, int):
+            comm = api.calculate_fee(bz, denom)
+            if comm != "":
                 old_amount = amount
-                amount = obj
-                #+10% for additional bytes after set_fee
+                amount = int(comm)
+                #+10% for additional bytes after set_fee and possible price changes
                 amount = (Decimal(amount)*Decimal(1.1)).to_integral_value()
                 self.set_fee(denom, str(amount))
             else:
-                fail_count += 1
-                if fail_count > 5:
-                    return 0                
-                amount = (Decimal(amount)*Decimal(1.1)).to_integral_value()
-                self.set_fee(denom, str(amount))
+                raise BuildException("can't calculate fee")
         return amount
         
 

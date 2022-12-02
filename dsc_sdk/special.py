@@ -3,10 +3,6 @@ from .transaction import Transaction
 from .tx_types import MsgSendCoin
 from .number_helpers import ether_to_wei
 
-class BuildException(Exception):
-    def __init__(self, message):            
-        super().__init__(message)
-
 def BuildSendAllCoin(signer: Wallet, api, recipient: str, coin_denom: str) -> bytes:
     balances = api.get_account_balances(signer.get_address())
     if coin_denom not in balances:
@@ -21,8 +17,6 @@ def BuildSendAllCoin(signer: Wallet, api, recipient: str, coin_denom: str) -> by
         msg = MsgSendCoin(signer.get_address(), recipient, coin_denom, ether_to_wei(1))
     tx = Transaction().build_tx(msg)
     fee_amount = tx.calculate_fee(signer, coin_denom, api)
-    if fee_amount == 0:
-        raise BuildException(f"not enough funds to pay fee")
     # build tx
     amount_to_send = full_amount - fee_amount
     msg = MsgSendCoin(signer.get_address(), recipient, coin_denom, str(amount_to_send))
