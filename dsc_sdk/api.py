@@ -72,7 +72,7 @@ class DscAPI:
             "denom": fee_denom,
         })
         obj = json.loads(resp)
-        if obj["ok"]:
+        if obj.get("ok", False):
             return obj["result"]["commission"]
         return ""
     
