@@ -1,5 +1,5 @@
 from dsc_sdk import DscAPI, Wallet, Transaction, MsgSendCoin, MsgSendToken, ether_to_wei, BuildSendAllCoin, \
-    dx_to_hex
+    d0_to_hex
 from web3 import Web3
 import time
 

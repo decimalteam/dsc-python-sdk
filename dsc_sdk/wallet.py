@@ -11,8 +11,8 @@ from web3 import Web3
 from .proto.ethermint.crypto.v1.ethsecp256k1 import keys_pb2 as ethermint_crypto
 
 DERIVATION_PATH = "m/44'/60'/0'/0/0"
-VALIDATOR_PREFIX = 'dxvaloper'
-ADDRESS_PREFIX = 'dx'
+VALIDATOR_PREFIX = 'd0valoper'
+ADDRESS_PREFIX = 'd0'
 
 class Wallet:
     """
@@ -165,14 +165,14 @@ def check_address_validity(address: str) -> bool:
         return False
     return True
 
-def dx_to_hex(address: str) -> str:
+def d0_to_hex(address: str) -> str:
     prefix, addr_bytes = bech32.bech32_decode(address)
     if prefix == None or addr_bytes == None:
         return None
     addr5to8 = bech32.convertbits(addr_bytes, 5, 8)
     return HexBytes(bytes(addr5to8)).hex()
 
-def hex_to_dx(address: str) -> str:
+def hex_to_d0(address: str) -> str:
     return bech32.bech32_encode(ADDRESS_PREFIX, HexBytes(address))
 
 def checksum_address(address: str) -> str:
