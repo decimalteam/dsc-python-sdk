@@ -80,6 +80,8 @@ tx = Transaction(msg)
 # optional: set memo, set custom coin fee...
 tx.set_memo("hello from python")
 tx.set_fee("initiald", ether_to_wei(1))
+# calculate_fee calculates fee in specified denom and set it
+# wallet is used for signing and for right transaction length
 tx.calculate_fee(wallet, "initiald", api)
 
 # sign transaction and get transaction bytes to send
@@ -96,6 +98,10 @@ print(txres.hash, txres.code, txres.codespace)
 - MsgSendCoin(sender: str, recipient: str, denom: str, amount: str)
 - MsgSendToken(sender: str, recipient: str, token_id: str, sub_token_ids: List[int])
 
+helper to send all coins
+
+- BuildSendAllCoin(signer: Wallet, api, recipient: str, coin_denom: str)
+
 ## Known query methods
 
 ## Helper functions
@@ -103,3 +109,4 @@ print(txres.hash, txres.code, txres.codespace)
 - `ether_to_wei` : convert integer value to valid amount representation ( * 10^18)
 - `finney_to_wei` : convert integer value to valid amount representation ( * 10^15)
 - `check_address_validity` : check bech32 address; return true if it's valid bech32 representation 
+- `d0_to_hex`, `hex_to_d0` : convert DSC address ith prefix d0 to/from Ethereum hex presentation

@@ -127,7 +127,7 @@ class DscAPI:
 
     @staticmethod
     def __validate_address(address: str):
-        if len(address) < 41 or not address.startswith('dx'):
+        if len(address) < 41 or not address.startswith('d0'):
             raise Exception('Invalid address')
 
     def __request_gate(self, path: str, method: str = 'get', payload=None, options={}):
