@@ -1,9 +1,9 @@
 from dsc_sdk import DscAPI, Wallet, Transaction, MsgSendCoin, MsgSendToken, ether_to_wei, BuildSendAllCoin, \
-    d0_to_hex
+    d0_to_hex, ERC20_DEFAULT_ABI
 from web3 import Web3
 import time
 
-api = DscAPI("https://devnet-gate.decimalchain.com/api/", "https://devnet-val.decimalchain.com/web3/")
+api = DscAPI("https://testnet-gate.decimalchain.com/api/", "https://testnet-val.decimalchain.com/web3/")
 api.get_parameters()
 print(api.get_chain_id())
 print(api.get_base_denom())
@@ -11,7 +11,7 @@ print(api.get_base_denom())
 ############################
 # send transaction
 
-step = 4
+step = 9
 
 # dx1tlykyxn3zddwm7w89raurwuvwa5apv4w32th0f
 mnemonic1 = "plug tissue today frown increase race brown sail post march trick coconut laptop churn call child question match also spend play credit already travel"
@@ -135,3 +135,18 @@ if step == 7:
     print("balance after tx")
     print(erc20_tkn.functions.balanceOf(adr1).call() )
     print(erc20_tkn.functions.balanceOf(adr2).call() )
+
+############################
+# erc balance
+if step == 8:
+    balances = api.get_account_erc_balances("0x4f5628750b2e82947cdf02ab45dd5456d919e716")
+    for b in balances:
+        print(b)
+
+############################
+# erc20 contract with default abi
+if step == 9:
+    erc20_tkn = api.erc20_contract_instance(w1, "0x21ee885dca392c4657eefe5adfa11971308de4c9", ERC20_DEFAULT_ABI)
+    print("token info:")
+    print(erc20_tkn.functions.name().call())
+    print(erc20_tkn.functions.symbol().call())

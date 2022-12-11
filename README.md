@@ -102,11 +102,21 @@ helper to send all coins
 
 - BuildSendAllCoin(signer: Wallet, api, recipient: str, coin_denom: str)
 
-## Known query methods
+## Known API query methods
+
+```
+get_account_balances(self, address: str) -> Dict[str, str]
+
+get_account_erc_balances(self, hex_address: str) -> List[ERCBalance]
+
+get_erc20_tokens(self, limit=10, offset=0)
+
+```
 
 ## Helper functions
 
 - `ether_to_wei` : convert integer value to valid amount representation ( * 10^18)
 - `finney_to_wei` : convert integer value to valid amount representation ( * 10^15)
+- `wei_to_ether` : convert amount string representation to float value ( / 10^18)
 - `check_address_validity` : check bech32 address; return true if it's valid bech32 representation 
 - `d0_to_hex`, `hex_to_d0` : convert DSC address ith prefix d0 to/from Ethereum hex presentation

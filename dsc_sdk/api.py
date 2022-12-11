@@ -1,6 +1,6 @@
 import requests
 import json
-from typing import Tuple, Dict
+from typing import Tuple, Dict, List
 import codecs
 from .wallet import Wallet
 from hexbytes import HexBytes
@@ -8,6 +8,16 @@ from eth_account import Account
 from web3 import Web3
 from web3.middleware import construct_sign_and_send_raw_middleware
 from .exceptions import ApiException
+from dataclasses import dataclass
+
+@dataclass
+class ERCBalance:
+    contract_address: str
+    symbol: str
+    amount: str
+    decimal: int
+    token_type: str # may be ERC20, ERC721, ERC1155
+
 class DscAPI:
     """
     Base class to perform operations on Decimal API.
@@ -55,6 +65,17 @@ class DscAPI:
             return result
         except KeyError:
             return {}
+
+    def get_account_erc_balances(self, hex_address: str) -> List[ERCBalance]:
+        resp = json.loads(self.__request_gate(f'evm-accounts/{hex_address}/balance'))
+        result = []
+        for subkey in ["evmAccountERC20TokenBalances", "evmAccountERC721TokenBalances", "evmAccountERC1155TokenBalances"]:
+            for bal in resp["result"]["evmTokenAccountBalances"][subkey]:
+                result.append(
+                    ERCBalance(bal["evmToken"]["address"], bal["evmToken"]["symbol"], bal["amount"],
+                        bal["evmToken"]["decimals"], bal["evmToken"]["evmTokenTypeName"])
+                )
+        return result
 
     def broadcast(self, tx_bytes: bytes):
         resp = json.loads(self.__request_gate("rpc/txs", method="post", payload={"hexTx": tx_bytes.hex()}))
@@ -154,3 +175,4 @@ class TxResult:
         self.code = code
         self.log = log
         self.codespace = codespace
+
