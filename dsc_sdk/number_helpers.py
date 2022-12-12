@@ -8,3 +8,6 @@ def ether_to_wei(v: float) -> str:
 
 def finney_to_wei(v: float) -> str:
     return str((__e15 * Decimal(v)).to_integral_value())
+
+def wei_to_ether(v: str) -> float:
+    return float(Decimal(v) / __e18)
