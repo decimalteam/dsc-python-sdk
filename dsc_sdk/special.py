@@ -16,6 +16,7 @@ def BuildSendAllCoin(signer: Wallet, api, recipient: str, coin_denom: str) -> by
         # simulate_fee will fail, if we trying to send full amount of base coin
         msg = MsgSendCoin(signer.get_address(), recipient, coin_denom, ether_to_wei(1))
     tx = Transaction().build_tx(msg)
+    tx.set_fee(coin_denom, ether_to_wei(1))
     fee_amount = tx.calculate_fee(signer, coin_denom, api)
     # build tx
     amount_to_send = full_amount - fee_amount
