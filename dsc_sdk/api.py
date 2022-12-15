@@ -8,6 +8,7 @@ from eth_account import Account
 from web3 import Web3
 from web3.middleware import construct_sign_and_send_raw_middleware
 from .exceptions import ApiException
+from .constants import *
 from dataclasses import dataclass
 
 @dataclass
@@ -32,14 +33,19 @@ class DscAPI:
         if self.gate_url[-1] != '/':
             self.gate_url += '/'
         self.web3_url = web3_url
+        if self.gate_url == MAINNET_GATE:
+            self.__base_denom = MAINNET_BASE_COIN
+        if self.gate_url == TESTNET_GATE:
+            self.__base_denom = TESTNET_BASE_COIN
+        if self.gate_url == DEVNET_GATE:
+            self.__base_denom = DEVNET_BASE_COIN
     
     def get_parameters(self):
         """
         load base blockchain parameters: chain_id, base denom
         """
-        resp = json.loads(self.__request_gate("rpc/genesis"))
-        self.__chain_id = resp["result"]["genesis"]["chain_id"]
-        self.__base_denom = resp["result"]["genesis"]["app_state"]["coin"]["params"]["base_denom"]
+        resp = self.__request_gate("rpc/genesis/chain")
+        self.__chain_id = resp
 
     def get_chain_id(self):
         return self.__chain_id

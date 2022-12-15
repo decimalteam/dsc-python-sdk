@@ -11,13 +11,13 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
-from gogoproto import gogo_pb2 as gogoproto_dot_gogo__pb2
+from ....gogoproto import gogo_pb2 as gogoproto_dot_gogo__pb2
 from google.protobuf import any_pb2 as google_dot_protobuf_dot_any__pb2
 from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
-from cosmos_proto import cosmos_pb2 as cosmos__proto_dot_cosmos__pb2
-from cosmos.base.v1beta1 import coin_pb2 as cosmos_dot_base_dot_v1beta1_dot_coin__pb2
-from cosmos.msg.v1 import msg_pb2 as cosmos_dot_msg_dot_v1_dot_msg__pb2
-from decimal.validator.v1 import validator_pb2 as decimal_dot_validator_dot_v1_dot_validator__pb2
+from ....cosmos_proto import cosmos_pb2 as cosmos__proto_dot_cosmos__pb2
+from ....cosmos.base.v1beta1 import coin_pb2 as cosmos_dot_base_dot_v1beta1_dot_coin__pb2
+from ....cosmos.msg.v1 import msg_pb2 as cosmos_dot_msg_dot_v1_dot_msg__pb2
+from ....decimal.validator.v1 import validator_pb2 as decimal_dot_validator_dot_v1_dot_validator__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(

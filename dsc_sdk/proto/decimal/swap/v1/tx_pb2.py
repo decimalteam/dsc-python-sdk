@@ -11,9 +11,9 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
-from gogoproto import gogo_pb2 as gogoproto_dot_gogo__pb2
-from cosmos_proto import cosmos_pb2 as cosmos__proto_dot_cosmos__pb2
-from cosmos.msg.v1 import msg_pb2 as cosmos_dot_msg_dot_v1_dot_msg__pb2
+from ....gogoproto import gogo_pb2 as gogoproto_dot_gogo__pb2
+from ....cosmos_proto import cosmos_pb2 as cosmos__proto_dot_cosmos__pb2
+from ....cosmos.msg.v1 import msg_pb2 as cosmos_dot_msg_dot_v1_dot_msg__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
