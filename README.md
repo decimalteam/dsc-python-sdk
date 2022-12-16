@@ -61,7 +61,9 @@ from dsc_sdk import DscAPI, Wallet, Transaction, MsgSendCoin, ...
 from dsc_sdk import ether_to_wei, finney_to_wei
 
 ##### 1. initialize api
-api = DscAPI("https://devnet-gate.decimalchain.com/api")
+# You can also use constants
+# MAINNET_GATE, TESTNET_GATE, DEVNET_GATE and MAINNET_WEB3, TESTNET_WEB3, DEVNET_WEB3
+api = DscAPI("https://devnet-gate.decimalchain.com/api", "https://devnet-val.decimalchain.com/web3/")
 api.get_parameters()
 
 ##### 2. create wallet and bind it to current blockchain
