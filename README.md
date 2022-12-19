@@ -64,6 +64,8 @@ from dsc_sdk import ether_to_wei, finney_to_wei
 # You can also use constants
 # MAINNET_GATE, TESTNET_GATE, DEVNET_GATE and MAINNET_WEB3, TESTNET_WEB3, DEVNET_WEB3
 api = DscAPI("https://devnet-gate.decimalchain.com/api", "https://devnet-val.decimalchain.com/web3/")
+# or, if you don't want to use web3 from API
+api = DscAPI("https://devnet-gate.decimalchain.com/api")
 api.get_parameters()
 
 ##### 2. create wallet and bind it to current blockchain
@@ -79,7 +81,7 @@ wallet.set_chain_id(api.get_chain_id())
 # sender and recipient must be valid bech32 address
 # like d01...
 msg = MsgSendCoin(sender, recipient, coin_denom, ether_to_wei(1))
-tx = Transaction(msg)
+tx = Transaction.build_tx(msg)
 
 # optional: set memo, set custom coin fee...
 tx.set_memo("hello from python")
@@ -92,7 +94,7 @@ tx.calculate_fee(wallet, "initiald", api)
 tx_bytes = tx.sign(wallet)
 
 ##### 4. send transaction and examine result
-txres = api.broadcast(txbytes)
+txres = api.broadcast(tx_bytes)
 print(txres.hash, txres.code, txres.codespace)
 
 ```

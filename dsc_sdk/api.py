@@ -28,11 +28,12 @@ class DscAPI:
     web3_url: http url to operate with EVM (need for erc20 tokens)
     """
 
-    def __init__(self, gate_url: str, web3_url: str):
+    def __init__(self, gate_url: str, web3_url: str = ""):
         self.gate_url = gate_url
         if self.gate_url[-1] != '/':
             self.gate_url += '/'
         self.web3_url = web3_url
+        self.__base_denom = MAINNET_BASE_COIN
         if self.gate_url == MAINNET_GATE:
             self.__base_denom = MAINNET_BASE_COIN
         if self.gate_url == TESTNET_GATE:
