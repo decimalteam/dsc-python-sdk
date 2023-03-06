@@ -24,8 +24,9 @@ wallet = Wallet('erase august mask elevator sand picture north there apple equal
 from dsc_sdk import Wallet
 
 wallet = Wallet()
-wallet.get_address() # returns wallet address
 wallet.get_mnemonic() # returns wallet mnemonic
+wallet.get_address() # returns wallet address
+wallet.get_ethereum_address() # returns wallet address hex (0x)
 ```
 
 ## Get DecimalAPI to perform transactions
