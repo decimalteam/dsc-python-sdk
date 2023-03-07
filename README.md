@@ -123,6 +123,7 @@ NOTE:
 
 helper to send all coins
 - `BuildSendAllCoin(signer: Wallet, api, recipient: str, coin_denom: str) -> bytes` (return signed transaction bytes)
+- `BuildSellAllCoin(signer: Wallet, api, recipient: str, coin_sell: str, coin_buy: str) -> bytes` (return signed transaction bytes)
 
 ### Multisig module contructors
 - `MsgCreateWallet(sender: str, owners: List[str], weights: List[int], threshold: int)` (Message to create multisig wallet)

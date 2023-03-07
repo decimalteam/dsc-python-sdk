@@ -1,5 +1,5 @@
 from dsc_sdk import DscAPI, Wallet, Transaction, MsgSendCoin, MsgSendToken, ether_to_wei, BuildSendAllCoin, \
-    d0_to_hex, ERC20_DEFAULT_ABI
+    d0_to_hex, ERC20_DEFAULT_ABI, BuildSellAllCoin
 from web3 import Web3
 import time
 
@@ -102,6 +102,18 @@ if step == 5:
     txbytes = BuildSendAllCoin(w1, api, w2.get_address(), "del")
     if txbytes == None:
         exit(0)    
+    txres = api.broadcast(txbytes)
+    print(txres.hash, txres.code, txres.codespace, txres.log)
+
+############################
+# sell all
+if step == 4:
+    an, seq = api.get_account_number_and_sequence(w1.get_address())
+    w1.set_account_number(an)
+    w1.set_sequence(seq)
+    txbytes = BuildSellAllCoin(w1, api, w2.get_address(), "initiald")
+    if txbytes == None:
+        exit(0)
     txres = api.broadcast(txbytes)
     print(txres.hash, txres.code, txres.codespace, txres.log)
 
