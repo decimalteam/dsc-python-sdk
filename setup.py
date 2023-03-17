@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="dsc-python-sdk",
-    version="1.1.3",
+    version="1.1.5",
     author="DecimalTeam",
     description="",
     long_description=long_description,

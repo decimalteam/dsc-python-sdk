@@ -73,6 +73,14 @@ class DscAPI:
         except KeyError:
             return {}
 
+    def get_nft_tokens(self, address: str) -> Dict[str, str]:
+        self.__validate_address(address)
+        resp = json.loads(self.__request_gate(f'address/{address}/nfts'))
+        try:
+            return resp["result"]
+        except KeyError:
+            return {}
+
     def get_account_erc_balances(self, hex_address: str) -> List[ERCBalance]:
         resp = json.loads(self.__request_gate(f'evm-accounts/{hex_address}/balance'))
         result = []

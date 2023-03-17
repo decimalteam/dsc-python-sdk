@@ -14,6 +14,7 @@ DERIVATION_PATH = "m/44'/60'/0'/0/0"
 VALIDATOR_PREFIX = 'd0valoper'
 ADDRESS_PREFIX = 'd0'
 
+
 class Wallet:
     """
     Decimal wallet class
@@ -48,13 +49,13 @@ class Wallet:
     def get_ethereum_address(self) -> str:
         '''
         returns hex addres of the wallet in lower case (need for search)
-        '''        
+        '''
         return self._ethereum_address
 
     def get_checksum_address(self) -> str:
         '''
         returns hex addres of the wallet in mixed case (need for contract calls)
-        '''  
+        '''
         return self._checksum_address
 
     def get_mnemonic(self) -> str:
@@ -99,7 +100,7 @@ class Wallet:
     def increment_sequence(self):
         self._sequence += 1
 
-    def set_chain_id(self, chain_id: str) :
+    def set_chain_id(self, chain_id: str):
         '''
         set chain id for transaction signing
         '''
@@ -141,10 +142,10 @@ class Wallet:
         self._public_key_binary = PublicKey.from_valid_secret(self._private_key).format(compressed=False)
         self._public_key = base64.b64encode(self._public_key_binary)
         self._public_key_eth = ethermint_crypto.PubKey(
-            key =  PublicKey.from_valid_secret(self._private_key).format(compressed=True)
+            key=PublicKey.from_valid_secret(self._private_key).format(compressed=True)
         )
         self._private_key_eth = PrivateKey(
-            secret = self._private_key
+            secret=self._private_key
         )
 
     def __hash_public_key(self):
@@ -154,6 +155,7 @@ class Wallet:
 
     def sign_bytes(self, msg: bytes) -> bytes:
         return self._private_key_eth.sign_recoverable(msg, hasher=None)
+
 
 def check_address_validity(address: str) -> bool:
     prefix, addr_bytes = bech32.bech32_decode(address)
@@ -165,6 +167,7 @@ def check_address_validity(address: str) -> bool:
         return False
     return True
 
+
 def d0_to_hex(address: str) -> str:
     prefix, addr_bytes = bech32.bech32_decode(address)
     if prefix == None or addr_bytes == None:
@@ -172,8 +175,11 @@ def d0_to_hex(address: str) -> str:
     addr5to8 = bech32.convertbits(addr_bytes, 5, 8)
     return HexBytes(bytes(addr5to8)).hex()
 
+
 def hex_to_d0(address: str) -> str:
-    return bech32.bech32_encode(ADDRESS_PREFIX, HexBytes(address))
+    addr8to5 = bech32.convertbits(HexBytes(address), 8, 5)
+    return bech32.bech32_encode(ADDRESS_PREFIX, addr8to5)
+
 
 def checksum_address(address: str) -> str:
     return Web3.toChecksumAddress(address)
