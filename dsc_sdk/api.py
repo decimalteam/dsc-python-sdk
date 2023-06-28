@@ -51,6 +51,34 @@ class DscAPI:
     def get_chain_id(self):
         return self.__chain_id
 
+    def get_block_latest(self):
+        resp = json.loads(self.__request_gate(f'block/height'))
+        try:
+            return int(resp)
+        except KeyError:
+            return 0
+
+    def get_blocks(self, limit: int = 10, offset: int = 0):
+        resp = json.loads(self.__request_gate(f'blocks?limit={limit}&offset={offset}'))
+        try:
+            return resp["result"]
+        except KeyError:
+            return {}
+
+    def get_block(self, height):
+        resp = json.loads(self.__request_gate(f'block/{height}'))
+        try:
+            return resp["result"]
+        except KeyError:
+            return {}
+
+    def get_block_validator(self, height):
+        resp = json.loads(self.__request_gate(f'block/{height}/validators'))
+        try:
+            return resp["result"]
+        except KeyError:
+            return {}
+
     def get_base_denom(self):
         return self.__base_denom
 
@@ -70,6 +98,35 @@ class DscAPI:
             for k,v in resp["result"].items():
                 result[k] = v["amount"]
             return result
+        except KeyError:
+            return {}
+
+    def get_transactions_address(self, address: str, limit: int = 10, offset: int = 0) -> Dict[str, str]:
+        self.__validate_address(address)
+        resp = json.loads(self.__request_gate(f'address/{address}/txs?limit={limit}&offset={offset}'))
+        try:
+            return resp["result"]
+        except KeyError:
+            return {}
+
+    def get_coin_price(self, symbol: str) -> float:
+        resp = json.loads(self.__request_gate(f'coin/{symbol}'))
+        try:
+            return float(resp["result"]['priceBase'])
+        except KeyError:
+            return 0.0
+
+    def get_coin_by_symbol(self, symbol: str) -> Dict[str, str]:
+        resp = json.loads(self.__request_gate(f'coin/{symbol}'))
+        try:
+            return resp["result"]['priceBase']
+        except KeyError:
+            return {}
+
+    def get_coins(self, order: str = 'symbol', type_order: str = 'DESC', limit: int = 100, offset: int = 0) -> Dict[str, str]:
+        resp = json.loads(self.__request_gate(f'coins?order[{order}]={type_order}&limit={limit}&offset={offset}'))
+        try:
+            return resp["result"]
         except KeyError:
             return {}
 

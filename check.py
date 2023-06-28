@@ -1,17 +1,28 @@
 from dsc_sdk import DscAPI, Wallet, Transaction, MsgSendCoin, MsgSendToken, ether_to_wei, BuildSendAllCoin, \
-    d0_to_hex, ERC20_DEFAULT_ABI, BuildSellAllCoin
+    d0_to_hex, ERC20_DEFAULT_ABI, BuildSellAllCoin, MultiSendEntry, MsgMultiSendCoin, MsgSellCoin
 from web3 import Web3
 import time
 
-api = DscAPI("https://testnet-gate.decimalchain.com/api/", "https://testnet-val.decimalchain.com/web3/")
+api = DscAPI("https://devnet-gate.decimalchain.com/api/", "https://devnet-val.decimalchain.com/web3/")
 api.get_parameters()
 print(api.get_chain_id())
 print(api.get_base_denom())
 
 ############################
+# block info
+
+last_block = api.get_block_latest()
+print(last_block)
+last_block = api.get_block(last_block)
+print(last_block)
+last_block = api.get_block_validator(last_block)
+print(last_block)
+
+
+############################
 # send transaction
 
-step = 9
+step = 1
 
 # dx1tlykyxn3zddwm7w89raurwuvwa5apv4w32th0f
 mnemonic1 = "plug tissue today frown increase race brown sail post march trick coconut laptop churn call child question match also spend play credit already travel"
@@ -31,8 +42,22 @@ w2.set_account_number(an)
 w2.set_sequence(seq)
 w2.set_chain_id(api.get_chain_id())
 
-if step == 1:
+if step == 0:
     msg = MsgSendCoin(w1.get_address(), w2.get_address(), api.get_base_denom(), ether_to_wei(1))
+    tx = Transaction.build_tx(msg)
+    tx.set_memo("hello")
+    txbytes = tx.sign(w1)
+    #txres = api.broadcast_tx(txbytes, "sync")
+    txres = api.broadcast(txbytes)
+    print(txres.hash, txres.code, txres.codespace)
+
+if step == 1:
+    msg = MsgSellCoin(w1.get_address(),
+                      denom_to_sell="del",
+                      amount_to_sell="10",
+                      denom_to_buy='btt',
+                      min_amount_to_buy="0"
+                      )
     tx = Transaction.build_tx(msg)
     tx.set_memo("hello")
     txbytes = tx.sign(w1)
@@ -107,7 +132,7 @@ if step == 5:
 
 ############################
 # sell all
-if step == 4:
+if step == 6:
     an, seq = api.get_account_number_and_sequence(w1.get_address())
     w1.set_account_number(an)
     w1.set_sequence(seq)
@@ -119,14 +144,14 @@ if step == 4:
 
 ############################
 # erc20 bytescode
-if step == 6:
+if step == 7:
     bytecode = api.erc20_build_token("some name", "tkn", "100", "1000", True, True, True)
     txhash = api.erc20_create_token(w1, bytecode)
     print(txhash)
 
 ############################
 # erc20 list & abi
-if step == 7:
+if step == 8:
     tokens = api.get_erc20_tokens(limit=20)
     erc20_tkn = None
     for tok in tokens:
@@ -150,15 +175,32 @@ if step == 7:
 
 ############################
 # erc balance
-if step == 8:
+if step == 9:
     balances = api.get_account_erc_balances("0x4f5628750b2e82947cdf02ab45dd5456d919e716")
     for b in balances:
         print(b)
 
 ############################
 # erc20 contract with default abi
-if step == 9:
+if step == 10:
     erc20_tkn = api.erc20_contract_instance(w1, "0x21ee885dca392c4657eefe5adfa11971308de4c9", ERC20_DEFAULT_ABI)
     print("token info:")
     print(erc20_tkn.functions.name().call())
     print(erc20_tkn.functions.symbol().call())
+
+############################
+# erc20 contract with default abi
+if step == 11:
+
+    list_address = []
+
+    for x in range(2000):
+        list_address.append(
+            MultiSendEntry(recipient="d010eefpeqng85844r9tyrfl8rpek3tz00kchjqae", denom="del", amount="1")
+        )
+    msg = MsgMultiSendCoin(sender=w1.get_address(), sends=list_address)
+    tx = Transaction.build_tx(msg)
+    tx.set_memo("hello")
+    txbytes = tx.sign(w1)
+    txres = api.broadcast(txbytes)
+    print(txres.hash, txres.code, txres.codespace)

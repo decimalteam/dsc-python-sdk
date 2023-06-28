@@ -39,20 +39,20 @@ def MsgUpdateCoin(sender: str, denom: str, limit_volume: str, identity: str) -> 
 
 
 def MsgBuyCoin(sender: str, denom_to_buy: str, amount_to_buy: str,
-               denom_to_sell: str, max_amount_to_sell: str) -> coin_tx.MsgBuyCoin:
+               denom_to_sell: str) -> coin_tx.MsgBuyCoin:
     return coin_tx.MsgBuyCoin(
         sender=sender,
         coin_to_buy=cosmos_coin.Coin(denom=denom_to_buy, amount=amount_to_buy),
-        max_coin_to_sell=cosmos_coin.Coin(denom=denom_to_sell, amount=max_amount_to_sell)
+        max_coin_to_sell=cosmos_coin.Coin(denom=denom_to_sell, amount="0")
     )
 
 
 def MsgSellCoin(sender: str, denom_to_sell: str, amount_to_sell: str,
-                denom_to_buy: str, min_amount_to_buy: str) -> coin_tx.MsgSellCoin:
+                denom_to_buy: str) -> coin_tx.MsgSellCoin:
     return coin_tx.MsgSellCoin(
         sender=sender,
         coin_to_sell=cosmos_coin.Coin(denom=denom_to_sell, amount=amount_to_sell),
-        min_coin_to_buy=cosmos_coin.Coin(denom=denom_to_buy, amount=min_amount_to_buy)
+        min_coin_to_buy=cosmos_coin.Coin(denom=denom_to_buy, amount="0")
     )
 
 
