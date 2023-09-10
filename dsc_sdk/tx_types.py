@@ -29,12 +29,13 @@ def MsgCreateCoin(sender: str, denom: str, title: str, crr: int,
     )
 
 
-def MsgUpdateCoin(sender: str, denom: str, limit_volume: str, identity: str) -> coin_tx.MsgUpdateCoin:
+def MsgUpdateCoin(sender: str, denom: str, limit_volume: str, identity: str, min_volume: str) -> coin_tx.MsgUpdateCoin:
     return coin_tx.MsgUpdateCoin(
         sender=sender,
         denom=denom,
         limit_volume=limit_volume,
         identity=identity,
+        min_volume=min_volume,
     )
 
 

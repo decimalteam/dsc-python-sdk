@@ -1,5 +1,5 @@
 from dsc_sdk import DscAPI, Wallet, Transaction, MsgSendCoin, MsgSendToken, ether_to_wei, BuildSendAllCoin, \
-    d0_to_hex, ERC20_DEFAULT_ABI, BuildSellAllCoin, MultiSendEntry, MsgMultiSendCoin, MsgSellCoin
+    d0_to_hex, ERC20_DEFAULT_ABI, BuildSellAllCoin, MultiSendEntry, MsgMultiSendCoin, MsgSellCoin, MsgUpdateCoin
 from web3 import Web3
 import time
 
@@ -22,7 +22,7 @@ print(last_block)
 ############################
 # send transaction
 
-step = 1
+step = 12
 
 # dx1tlykyxn3zddwm7w89raurwuvwa5apv4w32th0f
 mnemonic1 = "plug tissue today frown increase race brown sail post march trick coconut laptop churn call child question match also spend play credit already travel"
@@ -202,5 +202,14 @@ if step == 11:
     tx = Transaction.build_tx(msg)
     tx.set_memo("hello")
     txbytes = tx.sign(w1)
+    txres = api.broadcast(txbytes)
+    print(txres.hash, txres.code, txres.codespace)
+
+if step == 12:
+    msg = MsgUpdateCoin(w1.get_address(), "test1234", ether_to_wei(5000000), "dsa", ether_to_wei(5000000))
+    tx = Transaction.build_tx(msg)
+    tx.set_memo("hello")
+    txbytes = tx.sign(w1)
+    #txres = api.broadcast_tx(txbytes, "sync")
     txres = api.broadcast(txbytes)
     print(txres.hash, txres.code, txres.codespace)
